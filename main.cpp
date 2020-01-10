@@ -173,13 +173,13 @@ void RenderScene(void)
 
     glBegin(GL_TRIANGLES); // Narysowanie zielonego trójkąta
         
-        glTexCoord2f(0.0f, 0.0f);
-        glVertex2f(0.0f, 0.0f);
+        glTexCoord2f(0.3f, 0.0f);
+        glVertex2f(0.0f, 0.0f); 
 
         glTexCoord2f(1.0f, 0.0f);
         glVertex2f(7.0f, 0.0f);
 
-        glTexCoord2f(0.0f, 1.0f);
+        glTexCoord2f(0.3f, 1.0f);
         glVertex2f(0.0f, 7.0f);
     
     glEnd();
@@ -283,7 +283,7 @@ void MyInit(void)
     glEnable(GL_CULL_FACE);
 
     //  Przeczytanie obrazu tekstury z pliku o nazwie tekstura.tga
-    pBytes = LoadTGAImage("P2_t.tga", &ImWidth, &ImHeight, &ImComponents, &ImFormat);
+    pBytes = LoadTGAImage("korwin.tga", &ImWidth, &ImHeight, &ImComponents, &ImFormat);
 
     /*************************************************************************************/
     glTexImage2D(GL_TEXTURE_2D, 0, ImComponents, ImWidth, ImHeight, 0, ImFormat, GL_UNSIGNED_BYTE, pBytes);
@@ -361,7 +361,7 @@ int main(int argc, char *argv[])
     glutReshapeFunc(ChangeSize);
     MyInit();
     glutKeyboardFunc(keys);
-    glutIdleFunc(spinEgg);
+    // glutIdleFunc(spinEgg);
 
     glEnable(GL_DEPTH_TEST);
     // Włączenie mechanizmu usuwania powierzchni niewidocznych

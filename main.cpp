@@ -171,19 +171,68 @@ void RenderScene(void)
     glRotatef(theta[1], 0.0, 1.0, 0.0);
     glRotatef(theta[2], 0.0, 0.0, 1.0);
 
-    glBegin(GL_TRIANGLES); // Narysowanie zielonego trójkąta
+    //podstawa dolna
+    glBegin(GL_POLYGON);
         
-        glTexCoord2f(0.3f, 0.0f);
-        glVertex2f(0.0f, 0.0f); 
+        glVertex3f(0.0f, 0.0f, 0.0f); 
+        glVertex3f(4.0f, 0.0f, 0.0f);
+        glVertex3f(4.0f, 4.0f, 0.0f);
+        glVertex3f(0.0f, 4.0f, 0.0f);
 
-        glTexCoord2f(1.0f, 0.0f);
-        glVertex2f(7.0f, 0.0f);
-
-        glTexCoord2f(0.3f, 1.0f);
-        glVertex2f(0.0f, 7.0f);
-    
     glEnd();
-    // glColor3f(1.0f, 1.0f, 1.0f);
+
+    // podstawa gorna
+    glBegin(GL_POLYGON);
+        
+        glVertex3f(0.0f, 0.0f, 4.0f); 
+        glVertex3f(4.0f, 0.0f, 4.0f);
+        glVertex3f(4.0f, 4.0f, 4.0f);
+        glVertex3f(0.0f, 4.0f, 4.0f);
+
+    glEnd();
+
+
+    // bok1
+    glBegin(GL_TRIANGLE_STRIP); 
+        
+        glVertex3f(0.0f, 0.0f, 0.0f); 
+        glVertex3f(4.0f, 0.0f, 0.0f);
+        glVertex3f(0.0f, 0.0f, 4.0f);
+        glVertex3f(4.0f, 0.0f, 4.0f);
+
+    glEnd();
+
+    // bok2
+    glBegin(GL_TRIANGLE_STRIP);
+        
+        glVertex3f(4.0f, 0.0f, 0.0f); 
+        glVertex3f(4.0f, 4.0f, 0.0f);
+        glVertex3f(4.0f, 0.0f, 4.0f);
+        glVertex3f(4.0f, 4.0f, 4.0f);
+
+    glEnd();
+
+    // bok3
+    glBegin(GL_TRIANGLE_STRIP);
+        
+        glVertex3f(4.0f, 4.0f, 0.0f); 
+        glVertex3f(0.0f, 4.0f, 0.0f);
+        glVertex3f(4.0f, 4.0f, 4.0f);
+        glVertex3f(0.0f, 4.0f, 4.0f);
+
+    glEnd();
+
+    // bok4
+    glBegin(GL_TRIANGLE_STRIP);
+        
+        glVertex3f(0.0f, 4.0f, 0.0f); 
+        glVertex3f(0.0f, 0.0f, 0.0f);
+        glVertex3f(0.0f, 4.0f, 4.0f);
+        glVertex3f(0.0f, 0.0f, 4.0f);
+
+    glEnd();
+
+    glColor3f(1.0f, 1.0f, 1.0f);
 
     glFlush();
     glutSwapBuffers();
@@ -361,7 +410,7 @@ int main(int argc, char *argv[])
     glutReshapeFunc(ChangeSize);
     MyInit();
     glutKeyboardFunc(keys);
-    // glutIdleFunc(spinEgg);
+    glutIdleFunc(spinEgg);
 
     glEnable(GL_DEPTH_TEST);
     // Włączenie mechanizmu usuwania powierzchni niewidocznych

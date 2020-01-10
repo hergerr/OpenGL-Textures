@@ -13,15 +13,6 @@ int getRand(int a, int b)
     return a + rand() % (b - a);
 }
 
-struct Point
-{
-    float x, y, z;
-    int a, b, c;
-};
-
-const int N = 21;
-vector<vector<Point>> points;
-
 GLbyte *LoadTGAImage(const char *FileName, GLint *ImWidth, GLint *ImHeight, GLint *ImComponents, GLenum *ImFormat)
 {
 
@@ -174,60 +165,102 @@ void RenderScene(void)
     //podstawa dolna
     glBegin(GL_POLYGON);
         
-        glVertex3f(0.0f, 0.0f, 0.0f); 
+        glVertex3f(0.0f, 0.0f, 0.0f);
+        glTexCoord2f(0.0f, 0.0f); 
+        
         glVertex3f(4.0f, 0.0f, 0.0f);
+        glTexCoord2f(1.0f, 0.0f); 
+
         glVertex3f(4.0f, 4.0f, 0.0f);
+        glTexCoord2f(1.0f, 1.0f); 
+
         glVertex3f(0.0f, 4.0f, 0.0f);
+        glTexCoord2f(0.0f, 1.0f); 
 
     glEnd();
 
     // podstawa gorna
     glBegin(GL_POLYGON);
         
-        glVertex3f(0.0f, 0.0f, 4.0f); 
+        glVertex3f(0.0f, 0.0f, 4.0f);
+        glTexCoord2f(0.0f, 0.0f); 
+
         glVertex3f(4.0f, 0.0f, 4.0f);
+        glTexCoord2f(1.0f, 0.0f); 
+        
         glVertex3f(4.0f, 4.0f, 4.0f);
+        glTexCoord2f(1.0f, 1.0f); 
+
         glVertex3f(0.0f, 4.0f, 4.0f);
+        glTexCoord2f(0.0f, 1.0f); 
 
     glEnd();
 
 
     // bok1
-    glBegin(GL_TRIANGLE_STRIP); 
+    glBegin(GL_POLYGON); 
         
-        glVertex3f(0.0f, 0.0f, 0.0f); 
+        glVertex3f(0.0f, 0.0f, 0.0f);
+        glTexCoord2f(0.0f, 0.0f); 
+
         glVertex3f(4.0f, 0.0f, 0.0f);
-        glVertex3f(0.0f, 0.0f, 4.0f);
+        glTexCoord2f(1.0f, 0.0f); 
+        
         glVertex3f(4.0f, 0.0f, 4.0f);
+        glTexCoord2f(1.0f, 1.0f); 
+
+        glVertex3f(0.0f, 0.0f, 4.0f);
+        glTexCoord2f(0.0f, 1.0f); 
 
     glEnd();
 
     // bok2
-    glBegin(GL_TRIANGLE_STRIP);
+    glBegin(GL_POLYGON);
         
-        glVertex3f(4.0f, 0.0f, 0.0f); 
+        glTexCoord2f(0.0f, 0.0f); 
+        glVertex3f(4.0f, 0.0f, 0.0f);
+
+        glTexCoord2f(1.0f, 0.0f); 
         glVertex3f(4.0f, 4.0f, 0.0f);
-        glVertex3f(4.0f, 0.0f, 4.0f);
+        
+        glTexCoord2f(1.0f, 1.0f); 
         glVertex3f(4.0f, 4.0f, 4.0f);
+        
+        glTexCoord2f(0.0f, 1.0f); 
+        glVertex3f(4.0f, 0.0f, 4.0f);
 
     glEnd();
 
     // bok3
-    glBegin(GL_TRIANGLE_STRIP);
+    glBegin(GL_POLYGON);
         
-        glVertex3f(4.0f, 4.0f, 0.0f); 
+        glTexCoord2f(0.0f, 0.0f); 
+        glVertex3f(4.0f, 4.0f, 0.0f);
+
+        glTexCoord2f(1.0f, 0.0f);  
         glVertex3f(0.0f, 4.0f, 0.0f);
-        glVertex3f(4.0f, 4.0f, 4.0f);
+        
+        glTexCoord2f(1.0f, 1.0f); 
         glVertex3f(0.0f, 4.0f, 4.0f);
+         
+        glTexCoord2f(0.0f, 1.0f);
+        glVertex3f(4.0f, 4.0f, 4.0f);
 
     glEnd();
 
     // bok4
-    glBegin(GL_TRIANGLE_STRIP);
+    glBegin(GL_POLYGON);
         
-        glVertex3f(0.0f, 4.0f, 0.0f); 
+        glTexCoord2f(0.0f, 0.0f); 
         glVertex3f(0.0f, 0.0f, 0.0f);
+
+        glTexCoord2f(1.0f, 0.0f);  
+        glVertex3f(0.0f, 4.0f, 0.0f);
+
+        glTexCoord2f(1.0f, 1.0f); 
         glVertex3f(0.0f, 4.0f, 4.0f);
+
+        glTexCoord2f(0.0f, 1.0f); 
         glVertex3f(0.0f, 0.0f, 4.0f);
 
     glEnd();
@@ -332,7 +365,10 @@ void MyInit(void)
     glEnable(GL_CULL_FACE);
 
     //  Przeczytanie obrazu tekstury z pliku o nazwie tekstura.tga
-    pBytes = LoadTGAImage("korwin.tga", &ImWidth, &ImHeight, &ImComponents, &ImFormat);
+    if (model == 1)
+        pBytes = LoadTGAImage("korwin.tga", &ImWidth, &ImHeight, &ImComponents, &ImFormat);
+    else
+        pBytes = LoadTGAImage("P2_t.tga", &ImWidth, &ImHeight, &ImComponents, &ImFormat);
 
     /*************************************************************************************/
     glTexImage2D(GL_TEXTURE_2D, 0, ImComponents, ImWidth, ImHeight, 0, ImFormat, GL_UNSIGNED_BYTE, pBytes);
@@ -386,13 +422,15 @@ void ChangeSize(GLsizei horizontal, GLsizei vertical)
 void keys(unsigned char key, int x, int y)
 {
 
-    if (key == 'p')
+    if (key == '1'){
+        cout << "1" << endl;
         model = 1;
-    if (key == 'w')
+    }
+    if (key == '2'){
+        cout << "2" << endl;
         model = 2;
-    if (key == 's')
-        model = 3;
-
+    }
+    MyInit();
     RenderScene(); // przerysowanie obrazu sceny
 }
 

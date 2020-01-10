@@ -22,6 +22,128 @@ struct Point
 const int N = 21;
 vector<vector<Point>> points;
 
+GLbyte *LoadTGAImage(const char *FileName, GLint *ImWidth, GLint *ImHeight, GLint *ImComponents, GLenum *ImFormat)
+{
+
+    /*************************************************************************************/
+
+    // Struktura dla nagłówka pliku  TGA
+
+#pragma pack(1)
+    typedef struct
+    {
+        GLbyte idlength;
+        GLbyte colormaptype;
+        GLbyte datatypecode;
+        unsigned short colormapstart;
+        unsigned short colormaplength;
+        unsigned char colormapdepth;
+        unsigned short x_orgin;
+        unsigned short y_orgin;
+        unsigned short width;
+        unsigned short height;
+        GLbyte bitsperpixel;
+        GLbyte descriptor;
+    } TGAHEADER;
+#pragma pack(8)
+
+    FILE *pFile;
+    TGAHEADER tgaHeader;
+    unsigned long lImageSize;
+    short sDepth;
+    GLbyte *pbitsperpixel = NULL;
+
+    /*************************************************************************************/
+
+    // Wartości domyślne zwracane w przypadku błędu
+
+    *ImWidth = 0;
+    *ImHeight = 0;
+    *ImFormat = GL_BGR_EXT;
+    *ImComponents = GL_RGB8;
+
+    pFile = fopen(FileName, "rb");
+    if (pFile == NULL)
+        return NULL;
+
+    /*************************************************************************************/
+    // Przeczytanie nagłówka pliku
+
+    fread(&tgaHeader, sizeof(TGAHEADER), 1, pFile);
+
+    /*************************************************************************************/
+
+    // Odczytanie szerokości, wysokości i głębi obrazu
+
+    *ImWidth = tgaHeader.width;
+    *ImHeight = tgaHeader.height;
+    sDepth = tgaHeader.bitsperpixel / 8;
+
+    /*************************************************************************************/
+    // Sprawdzenie, czy głębia spełnia założone warunki (8, 24, lub 32 bity)
+
+    if (tgaHeader.bitsperpixel != 8 && tgaHeader.bitsperpixel != 24 && tgaHeader.bitsperpixel != 32)
+        return NULL;
+
+    /*************************************************************************************/
+
+    // Obliczenie rozmiaru bufora w pamięci
+
+    lImageSize = tgaHeader.width * tgaHeader.height * sDepth;
+
+    /*************************************************************************************/
+
+    // Alokacja pamięci dla danych obrazu
+
+    pbitsperpixel = (GLbyte *)malloc(lImageSize * sizeof(GLbyte));
+
+    if (pbitsperpixel == NULL)
+        return NULL;
+
+    if (fread(pbitsperpixel, lImageSize, 1, pFile) != 1)
+    {
+        free(pbitsperpixel);
+        return NULL;
+    }
+
+    /*************************************************************************************/
+
+    // Ustawienie formatu OpenGL
+
+    switch (sDepth)
+
+    {
+
+    case 3:
+
+        *ImFormat = GL_BGR_EXT;
+
+        *ImComponents = GL_RGB8;
+
+        break;
+
+    case 4:
+
+        *ImFormat = GL_BGRA_EXT;
+
+        *ImComponents = GL_RGBA8;
+
+        break;
+
+    case 1:
+
+        *ImFormat = GL_LUMINANCE;
+
+        *ImComponents = GL_LUMINANCE8;
+
+        break;
+    };
+
+    fclose(pFile);
+
+    return pbitsperpixel;
+}
+
 void spinEgg()
 {
 
@@ -50,11 +172,18 @@ void RenderScene(void)
     glRotatef(theta[2], 0.0, 0.0, 1.0);
 
     glBegin(GL_TRIANGLES); // Narysowanie zielonego trójkąta
-    glVertex2f(0.0f, 0.0f);
-    glVertex2f(0.0f, 7.0f);
-    glVertex2f(7.0f, 0.0f);
+        
+        glTexCoord2f(0.0f, 0.0f);
+        glVertex2f(0.0f, 0.0f);
+
+        glTexCoord2f(1.0f, 0.0f);
+        glVertex2f(7.0f, 0.0f);
+
+        glTexCoord2f(0.0f, 1.0f);
+        glVertex2f(0.0f, 7.0f);
+    
     glEnd();
-    glColor3f(1.0f, 1.0f, 1.0f);
+    // glColor3f(1.0f, 1.0f, 1.0f);
 
     glFlush();
     glutSwapBuffers();
@@ -143,6 +272,40 @@ void MyInit(void)
     glEnable(GL_DEPTH_TEST); // włączenie mechanizmu z-bufora
 
     // Kolor czyszcący (wypełnienia okna) ustawiono na czarny
+
+    // Zmienne dla obrazu tekstury
+
+    GLbyte *pBytes;
+    GLint ImWidth, ImHeight, ImComponents;
+    GLenum ImFormat;
+
+    // Teksturowanie będzie prowadzone tyko po jedn`j stronie ściany
+    glEnable(GL_CULL_FACE);
+
+    //  Przeczytanie obrazu tekstury z pliku o nazwie tekstura.tga
+    pBytes = LoadTGAImage("P2_t.tga", &ImWidth, &ImHeight, &ImComponents, &ImFormat);
+
+    /*************************************************************************************/
+    glTexImage2D(GL_TEXTURE_2D, 0, ImComponents, ImWidth, ImHeight, 0, ImFormat, GL_UNSIGNED_BYTE, pBytes);
+
+    // Zwolnienie pamięci
+    free(pBytes);
+
+    // Włączenie mechanizmu teksturowania
+    glEnable(GL_TEXTURE_2D);
+
+    /*************************************************************************************/
+
+    // Ustalenie trybu teksturowania
+
+    glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+
+    /*************************************************************************************/
+
+    // Określenie sposobu nakładania tekstur
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 }
 
 /*************************************************************************************/
